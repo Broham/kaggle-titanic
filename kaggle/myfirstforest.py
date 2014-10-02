@@ -70,6 +70,8 @@ test_df['Gender'] = test_df['Sex'].map( {'female': 0, 'male': 1} ).astype(int)
 #     test_df.Embarked[ test_df.Embarked.isnull() ] = test_df.Embarked.dropna().mode().values
 # # Again convert all Embarked strings to int
 # test_df.Embarked = test_df.Embarked.map( lambda x: Ports_dict[x]).astype(int)
+
+#commenting out the above in favor of using one hot encoding for embarked
 test_df = pd.concat([test_df, pd.get_dummies(test_df['Embarked']).rename(columns=lambda x: 'Embarked_' + str(x))], axis=1)
 
 
@@ -91,7 +93,7 @@ if len(test_df.Fare[ test_df.Fare.isnull() ]) > 0:
 test_df["FamilySize"] = test_df["SibSp"] + test_df["Parch"]
 test_df["AgeClass"] = test_df["Age"]*test_df["Pclass"]
 
-#Title feature:
+#Title features using one-hot encoding:
 test_df["Title"] = test_df['Name'].map(lambda x: re.search('.*, (.*?\.).*',x).group(1))
 test_df = pd.concat([test_df, pd.get_dummies(test_df['Title']).rename(columns=lambda x: 'Title_' + str(x))], axis=1)
 
@@ -101,6 +103,7 @@ ids = test_df['PassengerId'].values
 # Remove the Name column, Cabin, Ticket, and Sex (since I copied and filled it to Gender)
 test_df = test_df.drop(['Name', 'Sex', 'Ticket', 'Cabin', 'PassengerId', 'Embarked', 'Title'], axis=1) 
 
+#Since the same titles dont necessarily exist in both the training set and the test set we will only take the columns that are in common between the two
 common_cols = [col for col in set(train_df.columns).intersection(test_df.columns)]
 test_df = test_df[common_cols]
 common_cols.insert(0,'Survived')
